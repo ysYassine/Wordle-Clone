@@ -76,6 +76,7 @@ function submitGuess() {
   const activeTiles = [...getActiveTiles()];
   if (activeTiles.length !== data.wordLength) {
     showAlert("Not enough letters");
+    shakeTiles(activeTiles);
   }
 }
 
@@ -91,4 +92,17 @@ function showAlert(message, duration = 1000) {
       alert.remove();
     });
   }, duration);
+}
+
+function shakeTiles(tiles) {
+  tiles.forEach((tile) => {
+    tile.classList.add("shake");
+    tile.addEventListener(
+      "animationend",
+      () => {
+        tile.classList.remove("shake");
+      },
+      { once: true }
+    );
+  });
 }
