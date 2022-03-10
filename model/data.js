@@ -15293,14 +15293,20 @@ const targetWords = [
   "shave",
 ];
 
+const offsetFromDate = new Date(2022, 0, 1);
+const msOffset = Date.now() - offsetFromDate;
+const dayOffset = msOffset / 1000 / 60 / 60 / 24;
 export default class Data {
   #targetWords;
   #dictionnary;
   #wordLength;
+  #targetWord;
+
   constructor() {
     this.#targetWords = targetWords;
     this.#dictionnary = dictionnary;
     this.#wordLength = WORD_LENGTH;
+    this.#targetWord = this.#targetWords[Math.floor(dayOffset)];
   }
 
   get targetWords() {
@@ -15311,5 +15317,8 @@ export default class Data {
   }
   get wordLength() {
     return this.#wordLength;
+  }
+  get targetWord() {
+    return this.#targetWord;
   }
 }

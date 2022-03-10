@@ -2,6 +2,7 @@ import Data from "../model/data.js";
 
 const data = new Data();
 const guessGrid = document.querySelector("[data-guess-grid]");
+const alertContainer = document.querySelector("[data-alert-container]");
 
 startInteraction();
 
@@ -71,4 +72,23 @@ function deleteKeyPressed() {
   delete lastTile.dataset.letter;
 }
 
-function submitGuess() {}
+function submitGuess() {
+  const activeTiles = [...getActiveTiles()];
+  if (activeTiles.length !== data.wordLength) {
+    showAlert("Not enough letters");
+  }
+}
+
+function showAlert(message, duration = 1000) {
+  const alert = document.createElement("div");
+  alert.textContent = message;
+  alert.classList.add("alert");
+  alertContainer.prepend(alert);
+  if (duration == null) return;
+  setTimeout(() => {
+    alert.classList.add("hide");
+    alert.addEventListener("transitionend", () => {
+      alert.remove();
+    });
+  }, duration);
+}
