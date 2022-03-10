@@ -9,6 +9,13 @@
   margin-bottom: 1em;
 }
 
+@media only screen and (max-width: 490px) {
+  .guess-grid {
+    grid-template-columns: repeat(5, 15vmin);
+    grid-template-rows: repeat(6, 15vmin);
+  }
+}
+
 .tile {
   font-size: 2em;
   color: white;
