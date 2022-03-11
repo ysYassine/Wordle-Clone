@@ -5,6 +5,10 @@ const alertContainer = document.querySelector("[data-alert-container]");
 const guessGrid = document.querySelector("[data-guess-grid]");
 const keyboard = document.querySelector("[data-keyboard]");
 
+// letters indexes containers
+const correctIndexes = [];
+const wrongLocationIndexes = [];
+
 const FLIP_ANIMATION_DURATION = 500;
 const DANCE_ANIMATION_DURATION = 500;
 
@@ -92,7 +96,40 @@ function submitGuess() {
     return;
   }
   stopInteraction();
+  checkLettersPositions(guess);
   activeTiles.forEach((...params) => flipTile(...params, guess));
+}
+
+function checkLettersPositions(guess) {
+  // Intermediate variables
+  let targetWordVar = data.targetWord;
+  let guessVar = guess;
+  // Empty the tables
+  correctIndexes.splice(0, correctIndexes.length);
+  wrongLocationIndexes.splice(0, wrongLocationIndexes.length);
+  // Get correct letters indexes
+  for (let index = 0; index < guess.length; index++)
+    if (guess[index] === data.targetWord[index]) correctIndexes.push(index);
+  // Change correct letters to exclude them from next treatments
+  correctIndexes.forEach((index) => {
+    guessVar = setCharAt(guessVar, index, "-");
+    targetWordVar = setCharAt(targetWordVar, index, "@");
+  });
+  // Search for wrong-position letters, save their index and remove them from next treatments
+  for (let index = 0; index < guessVar.length; index++) {
+    if (correctIndexes.includes(index)) continue;
+    if (targetWordVar.includes(guessVar[index])) {
+      let indexInTarget = targetWordVar.indexOf(guessVar[index]);
+      guessVar = setCharAt(guessVar, index, "-");
+      targetWordVar = setCharAt(targetWordVar, indexInTarget, "@");
+      wrongLocationIndexes.push(index);
+    }
+  }
+}
+
+function setCharAt(str, index, chr) {
+  if (index > str.length - 1) return str;
+  return str.substring(0, index) + chr + str.substring(index + 1);
 }
 
 function flipTile(tile, index, array, guess) {
@@ -106,10 +143,10 @@ function flipTile(tile, index, array, guess) {
     "transitionend",
     () => {
       tile.classList.remove("flip");
-      if (data.targetWord[index] === letter) {
+      if (correctIndexes.includes(index)) {
         tile.dataset.state = "correct";
         key.classList.add("correct");
-      } else if (data.targetWord.includes(letter)) {
+      } else if (wrongLocationIndexes.includes(index)) {
         tile.dataset.state = "wrong-location";
         key.classList.add("wrong-location");
       } else {
