@@ -15306,7 +15306,9 @@ export default class Data {
     this.#targetWords = targetWords;
     this.#dictionnary = dictionnary;
     this.#wordLength = WORD_LENGTH;
-    this.#targetWord = this.#targetWords[Math.floor(dayOffset)];
+    this.#targetWord = this.#targetWords[Math.floor(Math.random() * 1500)];
+    console.log(this.#targetWord);
+    // this.#targetWord = this.#targetWords[Math.floor(dayOffset)];
   }
 
   get targetWords() {
