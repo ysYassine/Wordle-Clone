@@ -12975,6 +12975,15 @@ const dictionnary = [
   "shave",
 ];
 
+const myListOfSpecialWords = [
+  "ugoat",
+  "mehsn",
+  "mhsen",
+  "teker",
+  "halwa",
+  "mercs",
+];
+
 const targetWords = [
   "chief",
   "catty",
@@ -15306,7 +15315,7 @@ export default class Data {
 
   constructor() {
     this.#targetWords = targetWords;
-    this.#dictionnary = dictionnary;
+    this.#dictionnary = [...dictionnary, ...myListOfSpecialWords];
     this.#wordLength = WORD_LENGTH;
     this.#wordDate = new Date();
     this.#targetWord = this.#targetWords[Math.floor(dayOffset)];
