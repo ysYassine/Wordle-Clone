@@ -7,6 +7,7 @@ const keyboard = document.querySelector("[data-keyboard]");
 
 const NOT_ENOUGH_LETTERS_MSG = "Not enough letters";
 const NOT_A_WORD_MSG = "Not a word";
+const ALREADY_TRIED = "Word already tried";
 const WIN_MSGS = [
   "SUS",
   "EPIC!",
@@ -20,7 +21,6 @@ const HISTORY_KEY = "guessHistory";
 
 const guessHistory = JSON.parse(localStorage.getItem(HISTORY_KEY)) ?? {
   date: new Date(),
-  length: 0,
   guesses: {},
 };
 
@@ -58,7 +58,6 @@ function addOldSessionsTries() {
 
 function resetLocalStorage() {
   guessHistory.date = data.wordDate;
-  guessHistory.length = 0;
   guessHistory.guesses = {};
   updateLocalStorage();
 }
@@ -131,7 +130,7 @@ function deleteKeyPressed() {
   delete lastTile.dataset.letter;
 }
 
-function submitGuess(updateHistory = false) {
+function submitGuess(updateHistory = true) {
   // getActiveTiles return Nodes so we need to convert it to a normal Array
   const activeTiles = [...getActiveTiles()];
 
@@ -150,9 +149,14 @@ function submitGuess(updateHistory = false) {
     shakeTiles(activeTiles);
     return;
   }
+  if (guessHistory.guesses[guess] != null) {
+    showAlert(ALREADY_TRIED);
+    shakeTiles(activeTiles);
+    return;
+  }
   stopInteraction();
   checkLettersPositions(guess);
-  if (!updateHistory) updateLocalStorage();
+  if (updateHistory) updateLocalStorage();
   activeTiles.forEach((...params) => flipTile(...params, guess, updateHistory));
 }
 
@@ -199,7 +203,6 @@ function checkLettersPositions(guess) {
     correctIndexes: correctIndexes,
     wrongLocationIndexes: wrongLocationIndexes,
   };
-  guessHistory.length++;
 }
 
 function setCharAt(str, index, chr) {
@@ -208,13 +211,15 @@ function setCharAt(str, index, chr) {
 }
 
 function checkWinLose(guess, tiles) {
+  const guessHistoryLength = Object.keys(guessHistory.guesses).length;
+  const latestGuess = Object.keys(guessHistory.guesses)[guessHistoryLength - 1];
   if (guess === data.targetWord) {
-    showAlert(WIN_MSGS[guessHistory.length - 1], 5000);
+    showAlert(WIN_MSGS[guessHistoryLength - 1], 5000);
     danceTiles(tiles);
     stopInteraction();
     return;
   }
-  if (guessHistory.guesses[data.targetWord] != null) return;
+  if (guess !== latestGuess) return;
   const remainingTiles = guessGrid.querySelectorAll(":not([data-letter])");
   if (remainingTiles.length === 0) {
     showAlert(data.targetWord.toUpperCase(), null);
