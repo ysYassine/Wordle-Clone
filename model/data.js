@@ -12981,6 +12981,8 @@ const myListOfSpecialWords = [
   "mhsen",
   "teker",
   "halwa",
+  "salwa",
+  "medhi",
   "mercs",
 ];
 

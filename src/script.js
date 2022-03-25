@@ -259,7 +259,7 @@ function updateLocalStorage() {
 
 function generateClipboard() {
   let msg = "";
-  const attempsCount = Object.keys(guessHistory.guesses).length;
+  let attempsCount = Object.keys(guessHistory.guesses).length;
   for (const word in guessHistory.guesses) {
     for (let j = 0; j < word.length; j++) {
       if (guessHistory.guesses[word].correctIndexes.includes(j)) {
@@ -276,7 +276,7 @@ function generateClipboard() {
   if (attempsCount === 6 && guessHistory.guesses[data.targetWord] == null)
     attempsCount = "X";
   msg =
-    "Wordle-Clone " +
+    "Werdl " +
     data.dayCount +
     " " +
     attempsCount +
