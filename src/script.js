@@ -21,6 +21,16 @@ const WIN_MSGS = [
   "THAT WAS CLOSE!",
 ];
 
+const DISCORD_EMOJIS = {
+  1: ":monkaHmm:",
+  2: ":POGGERS:",
+  3: ":EZ:",
+  4: ":YEP:",
+  5: ":PepeLaugh:",
+  6: ":monkaW:",
+  X: ":PepeHands:",
+};
+
 const LOCAL_STORAGE_HISTORY_KEY = "guessHistory";
 
 const guessHistory = JSON.parse(
@@ -276,11 +286,12 @@ function generateClipboard() {
   if (attempsCount === 6 && guessHistory.guesses[data.targetWord] == null)
     attempsCount = "X";
   msg =
-    "Werdl " +
+    "Talouli Wrdl " +
     data.dayCount +
     " " +
     attempsCount +
-    "/6" +
+    "/6 " +
+    DISCORD_EMOJIS[attempsCount] +
     `
 
 ` +
