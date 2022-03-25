@@ -256,9 +256,8 @@ function updateLocalStorage() {
 
 function generateClipboard() {
   let msg = "";
-  let attempsCount = 0;
+  const attempsCount = Object.keys(guessHistory.guesses).length;
   for (const word in guessHistory.guesses) {
-    attempsCount++;
     for (let j = 0; j < word.length; j++) {
       if (guessHistory.guesses[word].correctIndexes.includes(j)) {
         msg += "🟩";
@@ -282,7 +281,8 @@ function generateClipboard() {
     `
 
 ` +
-    msg;
+    msg +
+    "Play at: https://ysyassine.github.io/Wordle-Clone/";
   return msg;
 }
 
