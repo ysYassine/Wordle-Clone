@@ -163,7 +163,7 @@ function submitGuess(updateHistory = true) {
   activeTiles.forEach((...params) => flipTile(...params, guess, updateHistory));
 }
 
-function showAlert(message, duration = 1000) {
+function showAlert(message, duration = 1000, prepend = true) {
   const alert = document.createElement("div");
   alert.textContent = message;
   alert.classList.add("alert");
@@ -172,7 +172,8 @@ function showAlert(message, duration = 1000) {
     alertContainer.prepend(alert);
     return;
   }
-  alertContainer.prepend(alert);
+  if (prepend) alertContainer.prepend(alert);
+  else alertContainer.append(alert);
   setTimeout(() => {
     alert.classList.add("hide");
     alert.addEventListener("transitionend", () => {
@@ -195,9 +196,11 @@ function createShareMsg(alert, desktop) {
         });
       } else {
         navigator.clipboard.writeText(generateClipboard());
+        showAlert("Copied to clipboard", 700, false);
       }
     } else {
       navigator.clipboard.writeText(generateClipboard());
+      showAlert("Copied to clipboard", 700, false);
     }
   });
 }
