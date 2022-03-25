@@ -1,4 +1,8 @@
 import Data from "../model/data.js";
+import { setCharAt, mobileAndTabletCheck } from "../utils/utils.js";
+
+const FLIP_ANIMATION_DURATION = 500;
+const DANCE_ANIMATION_DURATION = 500;
 
 const data = new Data();
 const alertContainer = document.querySelector("[data-alert-container]");
@@ -17,15 +21,14 @@ const WIN_MSGS = [
   "THAT WAS CLOSE!",
 ];
 
-const HISTORY_KEY = "guessHistory";
+const LOCAL_STORAGE_HISTORY_KEY = "guessHistory";
 
-const guessHistory = JSON.parse(localStorage.getItem(HISTORY_KEY)) ?? {
+const guessHistory = JSON.parse(
+  localStorage.getItem(LOCAL_STORAGE_HISTORY_KEY)
+) ?? {
   date: new Date(),
   guesses: {},
 };
-
-const FLIP_ANIMATION_DURATION = 500;
-const DANCE_ANIMATION_DURATION = 500;
 
 startInteraction();
 addOldSessionsTries();
@@ -164,14 +167,39 @@ function showAlert(message, duration = 1000) {
   const alert = document.createElement("div");
   alert.textContent = message;
   alert.classList.add("alert");
+  if (duration == null) {
+    createShareMsg(alert, !mobileAndTabletCheck());
+    alertContainer.prepend(alert);
+    return;
+  }
   alertContainer.prepend(alert);
-  if (duration == null) return;
   setTimeout(() => {
     alert.classList.add("hide");
     alert.addEventListener("transitionend", () => {
       alert.remove();
     });
   }, duration);
+}
+
+function createShareMsg(alert, desktop) {
+  const shareText = document.createElement("div");
+  shareText.textContent =
+    "Click here to" + (desktop ? " copy " : " share ") + "results";
+  shareText.classList.add("share-text");
+  alert.append(shareText);
+  alertContainer.addEventListener("click", () => {
+    if (!desktop) {
+      if (navigator.share) {
+        navigator.share({
+          text: generateClipboard(),
+        });
+      } else {
+        navigator.clipboard.writeText(generateClipboard());
+      }
+    } else {
+      navigator.clipboard.writeText(generateClipboard());
+    }
+  });
 }
 
 function checkLettersPositions(guess) {
@@ -205,16 +233,11 @@ function checkLettersPositions(guess) {
   };
 }
 
-function setCharAt(str, index, chr) {
-  if (index > str.length - 1) return str;
-  return str.substring(0, index) + chr + str.substring(index + 1);
-}
-
 function checkWinLose(guess, tiles) {
   const guessHistoryLength = Object.keys(guessHistory.guesses).length;
   const latestGuess = Object.keys(guessHistory.guesses)[guessHistoryLength - 1];
   if (guess === data.targetWord) {
-    showAlert(WIN_MSGS[guessHistoryLength - 1], 5000);
+    showAlert(WIN_MSGS[guessHistoryLength - 1], null);
     danceTiles(tiles);
     stopInteraction();
     return;
@@ -228,7 +251,39 @@ function checkWinLose(guess, tiles) {
 }
 
 function updateLocalStorage() {
-  localStorage.setItem(HISTORY_KEY, JSON.stringify(guessHistory));
+  localStorage.setItem(LOCAL_STORAGE_HISTORY_KEY, JSON.stringify(guessHistory));
+}
+
+function generateClipboard() {
+  let msg = "";
+  let attempsCount = 0;
+  for (const word in guessHistory.guesses) {
+    attempsCount++;
+    for (let j = 0; j < word.length; j++) {
+      if (guessHistory.guesses[word].correctIndexes.includes(j)) {
+        msg += "🟩";
+      } else if (guessHistory.guesses[word].wrongLocationIndexes.includes(j)) {
+        msg += "🟨";
+      } else {
+        msg += "⬛";
+      }
+    }
+    msg += `
+`;
+  }
+  if (attempsCount === 6 && guessHistory.guesses[data.targetWord] == null)
+    attempsCount = "X";
+  msg =
+    "Wordle-Clone " +
+    data.dayCount +
+    " " +
+    attempsCount +
+    "/6" +
+    `
+
+` +
+    msg;
+  return msg;
 }
 
 function shakeTiles(tiles) {

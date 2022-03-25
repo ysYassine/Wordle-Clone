@@ -4,8 +4,8 @@
   grid-auto-rows: 2.5em;
   gap: 0.3em;
   justify-content: center;
-  margin-bottom: 1em;
 }
+
 @media only screen and (max-width: 490px) {
   .keyboard {
     display: grid;
@@ -13,7 +13,7 @@
     grid-auto-rows: 15vmin;
     gap: 0.8vmin;
     justify-content: center;
-    margin-bottom: 0.5em;
+    margin-bottom: 0.4em;
   }
 }
 

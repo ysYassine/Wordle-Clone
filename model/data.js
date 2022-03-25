@@ -13001,7 +13001,9 @@ const targetWords = [
   "mural",
   "slyly",
   "prose",
-  "royal",
+  "muddy",
+  "mehsn",
+  "ugoat",
   "staid",
   "fecal",
   "drain",
@@ -13068,7 +13070,7 @@ const targetWords = [
   "being",
   "goner",
   "flame",
-  "muddy",
+  "royal",
   "whirl",
   "stomp",
   "flora",
@@ -15302,7 +15304,7 @@ const targetWords = [
   "tardy",
 ];
 
-const offsetFromDate = new Date(2022, 0, 1);
+const offsetFromDate = new Date(2022, 2, 9);
 const msOffset = Date.now() - offsetFromDate;
 const dayOffset = msOffset / 1000 / 60 / 60 / 24;
 
@@ -15312,13 +15314,15 @@ export default class Data {
   #wordLength;
   #targetWord;
   #wordDate;
+  #dayCount;
 
   constructor() {
     this.#targetWords = targetWords;
     this.#dictionnary = [...dictionnary, ...myListOfSpecialWords];
     this.#wordLength = WORD_LENGTH;
     this.#wordDate = new Date();
-    this.#targetWord = this.#targetWords[Math.floor(dayOffset)];
+    this.#dayCount = Math.floor(dayOffset);
+    this.#targetWord = this.#targetWords[this.#dayCount % targetWords.length];
     // this.#targetWord = this.#targetWords[Math.floor(Math.random() * 1500)];
   }
 
@@ -15340,5 +15344,9 @@ export default class Data {
 
   get wordDate() {
     return this.#wordDate;
+  }
+
+  get dayCount() {
+    return this.#dayCount;
   }
 }
