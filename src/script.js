@@ -202,14 +202,14 @@ function createShareMsg(alert, desktop) {
     if (!desktop) {
       if (navigator.share) {
         navigator.share({
-          text: generateClipboard(!desktop),
+          text: generateClipboard(desktop),
         });
       } else {
-        navigator.clipboard.writeText(generateClipboard(!desktop));
+        navigator.clipboard.writeText(generateClipboard(desktop));
         showAlert("Copied to clipboard", 700, false);
       }
     } else {
-      navigator.clipboard.writeText(generateClipboard());
+      navigator.clipboard.writeText(generateClipboard(desktop));
       showAlert("Copied to clipboard", 700, false);
     }
   });
@@ -267,7 +267,7 @@ function updateLocalStorage() {
   localStorage.setItem(LOCAL_STORAGE_HISTORY_KEY, JSON.stringify(guessHistory));
 }
 
-function generateClipboard(desktop = true) {
+function generateClipboard(desktop) {
   let msg = "";
   let attempsCount = Object.keys(guessHistory.guesses).length;
   for (const word in guessHistory.guesses) {
