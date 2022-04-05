@@ -8,11 +8,9 @@
 
 @media only screen and (max-width: 490px) {
   .keyboard {
-    display: grid;
-    grid-template-columns: repeat(20, 4vmin);
-    grid-auto-rows: 15vmin;
-    gap: 0.8vmin;
-    justify-content: center;
+    grid-template-columns: repeat(20, 1fr);
+    grid-auto-rows: 12vmin;
+    gap: 1.4vmin;
     margin-bottom: 0.4em;
   }
 }
