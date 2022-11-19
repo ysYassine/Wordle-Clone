@@ -26,7 +26,9 @@ You have to guess a word in a maximum of 6 tries. Each guess must be a valid 5-l
   <img src="./images/wrong.png" alt="wrong letter" width="40"/>
 
 Every day there is a new word to guess 😀. You can share your score by pressing the notification displayed after you finish playing.
+
 <img src="./images/share.png" alt="notification" width="200"/>
+
 You score will be shared under this format:
 
     Wordle Clone 255 5/6
