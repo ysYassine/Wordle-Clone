@@ -1,4 +1,4 @@
-import Data from "../model/data.js";
+import Data from "./data.js";
 import { setCharAt, mobileAndTabletCheck } from "../utils/utils.js";
 
 const FLIP_ANIMATION_DURATION = 500;
@@ -286,7 +286,7 @@ function generateClipboard(desktop) {
   if (attempsCount === 6 && guessHistory.guesses[data.targetWord] == null)
     attempsCount = "X";
   msg =
-    "Talouli Wrdl " +
+    "Wordle Clone " +
     data.dayCount +
     " " +
     attempsCount +
