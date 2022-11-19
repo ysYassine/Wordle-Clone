@@ -1,4 +1,8 @@
-import Data from "../model/data.js";
+import Data from "./data.js";
+import { setCharAt, mobileAndTabletCheck } from "../utils/utils.js";
+
+const FLIP_ANIMATION_DURATION = 500;
+const DANCE_ANIMATION_DURATION = 500;
 
 const data = new Data();
 const alertContainer = document.querySelector("[data-alert-container]");
@@ -17,15 +21,24 @@ const WIN_MSGS = [
   "THAT WAS CLOSE!",
 ];
 
-const HISTORY_KEY = "guessHistory";
+const DISCORD_EMOJIS = {
+  1: ":monkaHmm:",
+  2: ":POGGERS:",
+  3: ":EZ:",
+  4: ":YEP:",
+  5: ":PepeLaugh:",
+  6: ":monkaW:",
+  X: ":PepeHands:",
+};
 
-const guessHistory = JSON.parse(localStorage.getItem(HISTORY_KEY)) ?? {
+const LOCAL_STORAGE_HISTORY_KEY = "guessHistory";
+
+const guessHistory = JSON.parse(
+  localStorage.getItem(LOCAL_STORAGE_HISTORY_KEY)
+) ?? {
   date: new Date(),
   guesses: {},
 };
-
-const FLIP_ANIMATION_DURATION = 500;
-const DANCE_ANIMATION_DURATION = 500;
 
 startInteraction();
 addOldSessionsTries();
@@ -160,18 +173,46 @@ function submitGuess(updateHistory = true) {
   activeTiles.forEach((...params) => flipTile(...params, guess, updateHistory));
 }
 
-function showAlert(message, duration = 1000) {
+function showAlert(message, duration = 1000, prepend = true) {
   const alert = document.createElement("div");
   alert.textContent = message;
   alert.classList.add("alert");
-  alertContainer.prepend(alert);
-  if (duration == null) return;
+  if (duration == null) {
+    createShareMsg(alert, !mobileAndTabletCheck());
+    alertContainer.prepend(alert);
+    return;
+  }
+  if (prepend) alertContainer.prepend(alert);
+  else alertContainer.append(alert);
   setTimeout(() => {
     alert.classList.add("hide");
     alert.addEventListener("transitionend", () => {
       alert.remove();
     });
   }, duration);
+}
+
+function createShareMsg(alert, desktop) {
+  const shareText = document.createElement("div");
+  shareText.textContent =
+    "Click here to" + (desktop ? " copy " : " share ") + "results";
+  shareText.classList.add("share-text");
+  alert.append(shareText);
+  alertContainer.addEventListener("click", () => {
+    if (!desktop) {
+      if (navigator.share) {
+        navigator.share({
+          text: generateClipboard(desktop),
+        });
+      } else {
+        navigator.clipboard.writeText(generateClipboard(desktop));
+        showAlert("Copied to clipboard", 700, false);
+      }
+    } else {
+      navigator.clipboard.writeText(generateClipboard(desktop));
+      showAlert("Copied to clipboard", 700, false);
+    }
+  });
 }
 
 function checkLettersPositions(guess) {
@@ -205,16 +246,11 @@ function checkLettersPositions(guess) {
   };
 }
 
-function setCharAt(str, index, chr) {
-  if (index > str.length - 1) return str;
-  return str.substring(0, index) + chr + str.substring(index + 1);
-}
-
 function checkWinLose(guess, tiles) {
   const guessHistoryLength = Object.keys(guessHistory.guesses).length;
   const latestGuess = Object.keys(guessHistory.guesses)[guessHistoryLength - 1];
   if (guess === data.targetWord) {
-    showAlert(WIN_MSGS[guessHistoryLength - 1], 5000);
+    showAlert(WIN_MSGS[guessHistoryLength - 1], null);
     danceTiles(tiles);
     stopInteraction();
     return;
@@ -228,7 +264,40 @@ function checkWinLose(guess, tiles) {
 }
 
 function updateLocalStorage() {
-  localStorage.setItem(HISTORY_KEY, JSON.stringify(guessHistory));
+  localStorage.setItem(LOCAL_STORAGE_HISTORY_KEY, JSON.stringify(guessHistory));
+}
+
+function generateClipboard(desktop) {
+  let msg = "";
+  let attempsCount = Object.keys(guessHistory.guesses).length;
+  for (const word in guessHistory.guesses) {
+    for (let j = 0; j < word.length; j++) {
+      if (guessHistory.guesses[word].correctIndexes.includes(j)) {
+        msg += "🟩";
+      } else if (guessHistory.guesses[word].wrongLocationIndexes.includes(j)) {
+        msg += "🟨";
+      } else {
+        msg += "⬛";
+      }
+    }
+    msg += `
+`;
+  }
+  if (attempsCount === 6 && guessHistory.guesses[data.targetWord] == null)
+    attempsCount = "X";
+  msg =
+    "Wordle Clone " +
+    data.dayCount +
+    " " +
+    attempsCount +
+    "/6 " +
+    (desktop ? DISCORD_EMOJIS[attempsCount] : "") +
+    `
+
+` +
+    msg +
+    "Play at: https://ysyassine.github.io/Wordle-Clone/";
+  return msg;
 }
 
 function shakeTiles(tiles) {
